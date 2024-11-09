@@ -3,6 +3,7 @@ import DelButton from "./DelButton.jsx";
 import {useState} from "react";
 import Filter from "./Filter.jsx";
 import ProductDetails from "./ProductDetails.jsx";
+import AddProduct from "./AddProduct.jsx";
 
 export default function AllProducts() {
     const [products, setProducts] = useState(DATA);
@@ -19,25 +20,37 @@ export default function AllProducts() {
         setModal(!modal);
     }
 
+    const addProduct = (newProduct) => {
+        setProducts(prevProdcuts => [...prevProdcuts, newProduct]);
+    }
+
 
     return (
-        <div>
-            <h1>Produkty</h1>
-            <Filter products={products} setFilteredProducts={setFilteredProducts}/>
-            <ul>
-                {filteredProducts.map((product) => (
-                    <li key={product.id} style={{listStyle: "none", cursor: "pointer"}}>
-                        <div onClick={() => toggleModal(product)}>
-                            <h2>{product.name}</h2>
-                            <p>{product.category}</p>
-                            <p>{product.quantity}</p>
-                            <p>{product.unitPrice}</p>
-                        </div>
-                        <DelButton handler={() => handleDelete(product.id)}></DelButton>
-                    </li>
-                ))}
-            </ul>
-            {modal && selectedProduct && (<ProductDetails product={selectedProduct} toggleModal={toggleModal}/>)}
-        </div>
+        <>
+            <div>
+                <AddProduct addProduct={addProduct}/>
+            </div>
+
+            <div>
+                <h1>Produkty</h1>
+                <Filter products={products} setFilteredProducts={setFilteredProducts}/>
+                <ul>
+                    {filteredProducts.map((product) => (
+                        <li key={product.id} style={{listStyle: "none", cursor: "pointer"}}>
+                            <div onClick={() => toggleModal(product)}>
+                                <h2>{product.name}</h2>
+                                <p>{product.category}</p>
+                                <p>{product.quantity}</p>
+                                <p>{product.unitPrice}</p>
+                            </div>
+                            <DelButton handler={() => handleDelete(product.id)}></DelButton>
+                        </li>
+                    ))}
+                </ul>
+                {modal && selectedProduct && (<ProductDetails product={selectedProduct} toggleModal={toggleModal}/>)}
+            </div>
+        </>
+
+
     );
 }
