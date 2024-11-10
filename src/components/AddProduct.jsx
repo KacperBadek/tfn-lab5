@@ -1,7 +1,6 @@
-import {Formik, Field, Form, ErrorMessage} from 'formik';
+import {Formik, Form} from 'formik';
 import * as Yup from 'yup';
-import InputField from "./InputField.jsx";
-import DelButton from "./DelButton.jsx";
+import InputFieldFormik from "./InputFieldFormik.jsx";
 
 export default function AddProduct({addProduct}) {
 
@@ -15,9 +14,10 @@ export default function AddProduct({addProduct}) {
         supplier: Yup.string().required('Pole nie może być puste').min(3)
     })
 
-    const handleSubmit = (values) => {
+    const handleSubmit = (values, {resetForm}) => {
         const newProduct = {...values}
         addProduct(newProduct)
+        resetForm();
     }
 
     return (
@@ -35,13 +35,14 @@ export default function AddProduct({addProduct}) {
 
                 {() => (
                     <Form>
-                        <InputField name="name" label="Nazwa" type="text"/>
-                        <InputField name="category" label="Kategoria" type="text"/>
-                        <InputField name="quantity" label="Ilość" type="number"/>
-                        <InputField name="unitPrice" label="Cena" type="number"/>
-                        <InputField name="description" label="Opis" type="text"/>
-                        <InputField name="dateAdded" label="Data Dodania" type="date"/>
-                        <InputField name="supplier" label="Dostawca" type="text"/>
+                        <InputFieldFormik name="name" label="Nazwa" type="text"/>
+                        <InputFieldFormik name="category" label="Kategoria" type="select"
+                                          options={["Elektronika", "Odzież", "Żywność"]}/>
+                        <InputFieldFormik name="quantity" label="Ilość" type="number"/>
+                        <InputFieldFormik name="unitPrice" label="Cena" type="number"/>
+                        <InputFieldFormik name="description" label="Opis" type="text"/>
+                        <InputFieldFormik name="dateAdded" label="Data Dodania" type="date"/>
+                        <InputFieldFormik name="supplier" label="Dostawca" type="text"/>
                         <button type="Submit">Dodaj</button>
                     </Form>
                 )}

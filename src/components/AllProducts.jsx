@@ -1,15 +1,17 @@
 import DATA from '../products.js'
-import DelButton from "./DelButton.jsx";
+import MyButton from "./MyButton.jsx";
 import {useState} from "react";
 import Filter from "./Filter.jsx";
 import ProductDetails from "./ProductDetails.jsx";
 import AddProduct from "./AddProduct.jsx";
+import EditProduct from "./EditProduct.jsx";
 
 export default function AllProducts() {
     const [products, setProducts] = useState(DATA);
     const [filteredProducts, setFilteredProducts] = useState(DATA);
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [modal, setModal] = useState(false);
+    const [edit, setEdit] = useState(false);
 
     const handleDelete = (id) => {
         setProducts(products.filter(product => product.id !== id))
@@ -20,10 +22,18 @@ export default function AllProducts() {
         setModal(!modal);
     }
 
+    const toggleEdit = (product) => {
+        setSelectedProduct(product);
+        setEdit(!edit)
+    }
+
     const addProduct = (newProduct) => {
         setProducts(prevProdcuts => [...prevProdcuts, newProduct]);
     }
 
+    const updateProduct = (updatedProduct) => {
+        setProducts(products.map(product => product.id === updatedProduct.id ? updatedProduct : product));
+    }
 
     return (
         <>
@@ -43,11 +53,13 @@ export default function AllProducts() {
                                 <p>{product.quantity}</p>
                                 <p>{product.unitPrice}</p>
                             </div>
-                            <DelButton handler={() => handleDelete(product.id)}></DelButton>
+                            <MyButton handler={() => toggleEdit(product)} text="Edytuj"></MyButton>
+                            <MyButton handler={() => handleDelete(product.id)} text="Usuń"></MyButton>
                         </li>
                     ))}
                 </ul>
                 {modal && selectedProduct && (<ProductDetails product={selectedProduct} toggleModal={toggleModal}/>)}
+                {edit && selectedProduct && (<EditProduct product={selectedProduct} toggleEdit={toggleEdit} updateProduct={updateProduct}/>)}
             </div>
         </>
 

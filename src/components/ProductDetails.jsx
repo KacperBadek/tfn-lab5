@@ -11,7 +11,7 @@ export default function ProductDetails({product, toggleModal}) {
                 <p>{product.dateAdded}</p>
                 <p>{product.supplier}</p>
                 <button className="close-modal" onClick={toggleModal}>
-                    CLOSE
+                    X
                 </button>
             </div>
         </div>
