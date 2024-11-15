@@ -32,7 +32,7 @@ export default function EditProduct({product, toggleEdit, updateProduct}) {
             newErrors.category = 'Kategoria jest wymagana';
             isValid = false;
         }
-        if (!quantity || quantity <= 0) {
+        if (!quantity || quantity <= 0 || !(parseInt(quantity) === Number(quantity))) {
             newErrors.quantity = 'Ilość musi być liczbą większą niż 0';
             isValid = false;
         }

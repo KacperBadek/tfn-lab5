@@ -10,7 +10,7 @@ export default function Filter({products, setFilteredProducts}) {
     useEffect(() => {
         const filtered = products.filter((product) => {
             const isCategoryMatch = category === 'Wszystko' || product.category === category;
-            const isPriceInRange = product.unitPrice >= priceMin && product.unitPrice <= priceMax;
+            const isPriceInRange = product.unitPrice >= parseFloat(priceMin) && product.unitPrice <= parseFloat(priceMax);
             return isCategoryMatch && isPriceInRange;
         });
 
