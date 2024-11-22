@@ -1,15 +1,19 @@
 import "./Modal.css"
+import {useContext} from "react";
+import {GlobalContext} from "../GlobalContext";
 
-export default function ProductDetails({product, toggleModal}) {
+export default function ProductDetails() {
+
+    const {selectedProduct, toggleModal} = useContext(GlobalContext);
 
     return (
         <div className="modal">
             <div onClick={toggleModal} className="overlay"></div>
             <div className="modal-content">
-                <h2>{product.name}</h2>
-                <p>{product.description}</p>
-                <p>{product.dateAdded}</p>
-                <p>{product.supplier}</p>
+                <h2>{selectedProduct.name}</h2>
+                <p>{selectedProduct.description}</p>
+                <p>{selectedProduct.dateAdded}</p>
+                <p>{selectedProduct.supplier}</p>
                 <button className="close-modal" onClick={toggleModal}>
                     X
                 </button>

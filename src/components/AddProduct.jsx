@@ -1,8 +1,11 @@
 import {Formik, Form} from 'formik';
 import * as Yup from 'yup';
 import InputFieldFormik from "./InputFieldFormik.jsx";
+import {GlobalContext} from "../GlobalContext";
+import {useContext} from "react";
 
-export default function AddProduct({addProduct}) {
+export default function AddProduct() {
+    const {addProduct} = useContext(GlobalContext);
 
     const validationSchema = Yup.object({
         name: Yup.string().required('Pole nie może być puste').min(3),

@@ -1,6 +1,8 @@
-import {useState, useEffect} from "react";
+import {useState, useEffect, useContext} from "react";
+import { GlobalContext } from "../GlobalContext";
 
-export default function Filter({products, setFilteredProducts}) {
+export default function Filter() {
+    const { products, setFilteredProducts } = useContext(GlobalContext);
 
     const [category, setCategory] = useState('Wszystko');
     const [priceMin, setPriceMin] = useState('0')

@@ -1,15 +1,19 @@
-import {useState} from "react";
+import {useContext, useState} from "react";
 import InputField from "./InputField.jsx";
 import "./Modal.css"
+import {GlobalContext} from "../GlobalContext";
 
-export default function EditProduct({product, toggleEdit, updateProduct}) {
-    const [name, setName] = useState(product.name);
-    const [category, setCategory] = useState(product.category);
-    const [quantity, setQuantity] = useState(product.quantity);
-    const [unitPrice, setUnitPrice] = useState(product.unitPrice);
-    const [description, setDescription] = useState(product.description);
-    const [dateAdded, setDateAdded] = useState(product.dateAdded);
-    const [supplier, setSupplier] = useState(product.supplier);
+export default function EditProduct() {
+
+    const {selectedProduct, toggleEdit, updateProduct} = useContext(GlobalContext);
+
+    const [name, setName] = useState(selectedProduct.name);
+    const [category, setCategory] = useState(selectedProduct.category);
+    const [quantity, setQuantity] = useState(selectedProduct.quantity);
+    const [unitPrice, setUnitPrice] = useState(selectedProduct.unitPrice);
+    const [description, setDescription] = useState(selectedProduct.description);
+    const [dateAdded, setDateAdded] = useState(selectedProduct.dateAdded);
+    const [supplier, setSupplier] = useState(selectedProduct.supplier);
     const [errors, setErrors] = useState({
         name: '',
         category: '',
@@ -62,7 +66,7 @@ export default function EditProduct({product, toggleEdit, updateProduct}) {
 
         if (validateForm()) {
             const updatedProduct = {
-                ...product,
+                ...selectedProduct,
                 name,
                 category,
                 quantity,
