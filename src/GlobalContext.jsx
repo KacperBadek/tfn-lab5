@@ -1,5 +1,4 @@
 import React, {createContext, useState} from "react";
-import DATA from "./products";
 
 export const GlobalContext = createContext();
 
@@ -9,9 +8,15 @@ export const GlobalProvider = ({children}) => {
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [modal, setModal] = useState(false);
     const [edit, setEdit] = useState(false);
+    const [isProductAdded, setIsProductAdded] = useState(false);
+    const [notification, setNotification] = useState(false);
+    const [notificationMessage, setNotificationMessage] = useState(null);
 
     const addProduct = (newProduct) => {
         setProducts((prevProducts) => [...prevProducts, newProduct]);
+        setIsProductAdded(true);
+        setNotificationMessage(`Dodano produkt: ${newProduct.name}`);
+        toggleNotification();
     };
 
     const updateProduct = (updatedProduct) => {
@@ -20,6 +25,8 @@ export const GlobalProvider = ({children}) => {
                 product.id === updatedProduct.id ? updatedProduct : product
             )
         );
+        setNotificationMessage(`Edytowano produkt, id: ${updatedProduct.id}`);
+        toggleNotification();
     };
 
     const deleteProduct = (id) => {
@@ -38,6 +45,10 @@ export const GlobalProvider = ({children}) => {
         setEdit(!edit);
     };
 
+    const toggleNotification = () => {
+        setNotification(!notification);
+    }
+
     return (
         <GlobalContext.Provider
             value={{
@@ -48,8 +59,14 @@ export const GlobalProvider = ({children}) => {
                 selectedProduct,
                 modal,
                 edit,
+                isProductAdded,
+                setIsProductAdded,
+                notification,
+                setNotification,
+                notificationMessage,
                 toggleModal,
                 toggleEdit,
+                toggleNotification,
                 addProduct,
                 updateProduct,
                 deleteProduct,

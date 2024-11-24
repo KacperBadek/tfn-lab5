@@ -19,7 +19,7 @@ export default function AddProduct() {
 
     const handleSubmit = (values, {resetForm}) => {
         const newProduct = {...values}
-        addProduct(newProduct)
+        addProduct(newProduct);
         resetForm();
     }
 
