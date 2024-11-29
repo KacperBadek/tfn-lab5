@@ -17,6 +17,7 @@ export default function AllProducts() {
         toggleModal,
         toggleEdit,
         modal,
+
         edit,
         isProductAdded,
         setIsProductAdded,
