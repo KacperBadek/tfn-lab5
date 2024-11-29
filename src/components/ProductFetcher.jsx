@@ -4,7 +4,7 @@ import {GlobalContext} from "../GlobalContext.jsx";
 
 export default function ProductFetcher() {
 
-    const {setProducts} = useContext(GlobalContext);
+    const {setProducts, setFilteredProducts} = useContext(GlobalContext);
 
     const [isLoading, setIsLoading] = useState(true);
     const [errors, setErrors] = useState("");
@@ -15,6 +15,8 @@ export default function ProductFetcher() {
         try {
             const response = await axios.get(API_URL);
             setProducts(response.data);
+            setFilteredProducts(response.data);
+            console.log("Fetched Products:", response.data);
         } catch (error) {
             setErrors(`Nie udało się załadować produktów :(, ${error}`);
         } finally {
@@ -33,7 +35,7 @@ export default function ProductFetcher() {
 
     const updateProduct = async (id, updatedProduct) => {
         try {
-            await axios.get(`${API_URL}/${id}`, updatedProduct);
+            await axios.put(`${API_URL}/${id}`, updatedProduct);
             await fetchProducts();
         } catch (error) {
             setErrors(`Nie udało się zaktualizować produktu: ${id} :(, ${error}`);
@@ -42,7 +44,7 @@ export default function ProductFetcher() {
 
     const deleteProduct = async (id) => {
         try {
-            await axios.get(`${API_URL}/${id}`);
+            await axios.delete(`${API_URL}/${id}`);
             await fetchProducts();
         } catch (error) {
             setErrors(`Nie udało się usunąć produktu: ${id} :(, ${error}`);

@@ -6,6 +6,7 @@ import AddProduct from "./AddProduct.jsx";
 import EditProduct from "./EditProduct.jsx";
 import Notification from "./Notification.jsx";
 import {GlobalContext} from "../GlobalContext.jsx";
+import products from "../products.js";
 
 export default function AllProducts() {
 
@@ -44,20 +45,28 @@ export default function AllProducts() {
             <div>
                 <h1>Produkty</h1>
                 <Filter/>
+                {/*<ul>*/}
+                {/*    {filteredProducts.map((product, index) => (*/}
+                {/*        <li key={product.id} style={{listStyle: "none", cursor: "pointer"}}*/}
+                {/*            ref={index === filteredProducts.length - 1 ? lastProductRef : null}>*/}
+                {/*            <div onClick={() => toggleModal(product)}>*/}
+                {/*                <h2>{product.name}</h2>*/}
+                {/*                <p>{product.category}</p>*/}
+                {/*                <p>{product.quantity}</p>*/}
+                {/*                <p>{product.unitPrice}</p>*/}
+                {/*            </div>*/}
+                {/*            <MyButton handler={() => toggleEdit(product)} text="Edytuj"></MyButton>*/}
+                {/*            <MyButton handler={() => deleteProduct(product.id)} text="Usuń"></MyButton>*/}
+                {/*        </li>*/}
+                {/*    ))}*/}
+                {/*</ul>*/}
+
                 <ul>
-                    {filteredProducts.map((product, index) => (
-                        <li key={product.id} style={{listStyle: "none", cursor: "pointer"}}
-                            ref={index === filteredProducts.length - 1 ? lastProductRef : null}>
-                            <div onClick={() => toggleModal(product)}>
-                                <h2>{product.name}</h2>
-                                <p>{product.category}</p>
-                                <p>{product.quantity}</p>
-                                <p>{product.unitPrice}</p>
-                            </div>
-                            <MyButton handler={() => toggleEdit(product)} text="Edytuj"></MyButton>
-                            <MyButton handler={() => deleteProduct(product.id)} text="Usuń"></MyButton>
+                    {products.map((product) => (
+                        <li key={product.id}>
+                            <h2>{product.name}</h2>
                         </li>
-                    ))}
+                        ))}
                 </ul>
 
                 {modal && selectedProduct && (<ProductDetails product={selectedProduct} toggleModal={toggleModal}/>)}

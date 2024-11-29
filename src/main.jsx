@@ -3,10 +3,12 @@ import {createRoot} from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
 import {GlobalProvider} from "./GlobalContext.jsx";
+import ProductFetcher from "./components/ProductFetcher.jsx";
 
 createRoot(document.getElementById('root')).render(
     <StrictMode>
         <GlobalProvider>
+            <ProductFetcher/>
             <App/>
         </GlobalProvider>
     </StrictMode>,
