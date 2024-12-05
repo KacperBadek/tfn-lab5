@@ -7,7 +7,7 @@ export default function ProductFetcher() {
     const {setProducts, setFilteredProducts} = useContext(GlobalContext);
 
     const [isLoading, setIsLoading] = useState(true);
-    const [errors, setErrors] = useState("");
+    const [error, setError] = useState("");
 
     const API_URL = "http://localhost:3000/products";
 
@@ -18,49 +18,22 @@ export default function ProductFetcher() {
             setFilteredProducts(response.data);
             console.log("Fetched Products:", response.data);
         } catch (error) {
-            setErrors(`Nie udało się załadować produktów :(, ${error}`);
+            setError(`Nie udało się załadować produktów :(, ${error}`);
         } finally {
             setIsLoading(false);
         }
     }
 
-    const addProduct = async (newProduct) => {
-        try {
-            await axios.post(API_URL, newProduct);
-            await fetchProducts();
-        } catch (error) {
-            setErrors(`Nie udało się dodać produktu :(, ${error}`);
-        }
-    }
-
-    const updateProduct = async (id, updatedProduct) => {
-        try {
-            await axios.put(`${API_URL}/${id}`, updatedProduct);
-            await fetchProducts();
-        } catch (error) {
-            setErrors(`Nie udało się zaktualizować produktu: ${id} :(, ${error}`);
-        }
-    }
-
-    const deleteProduct = async (id) => {
-        try {
-            await axios.delete(`${API_URL}/${id}`);
-            await fetchProducts();
-        } catch (error) {
-            setErrors(`Nie udało się usunąć produktu: ${id} :(, ${error}`);
-        }
-    }
-
     useEffect(() => {
         setIsLoading(true);
-        setErrors("");
+        setError("");
         fetchProducts();
     }, []);
 
     return (
         <div>
             {isLoading && <p>Loading products...</p>}
-            {errors && <p style={{color: "red"}}>{errors}</p>}
+            {error && <p style={{color: "red"}}>{error}</p>}
         </div>
     );
 

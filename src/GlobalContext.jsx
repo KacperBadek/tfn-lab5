@@ -1,4 +1,5 @@
-import React, {createContext, useState} from "react";
+import {createContext, useState} from "react";
+import axios from "axios";
 
 export const GlobalContext = createContext();
 
@@ -11,28 +12,59 @@ export const GlobalProvider = ({children}) => {
     const [isProductAdded, setIsProductAdded] = useState(false);
     const [notification, setNotification] = useState(false);
     const [notificationMessage, setNotificationMessage] = useState(null);
+    const [apiError, setApiError] = useState("");
+    const [currentPage, setCurrentPage] = useState(1);
+    const [productsPerPage, setProductsPerPage] = useState(4);
 
-    const addProduct = (newProduct) => {
-        setProducts((prevProducts) => [...prevProducts, newProduct]);
-        setIsProductAdded(true);
-        setNotificationMessage(`Dodano produkt: ${newProduct.name}`);
-        toggleNotification();
+
+    const API_URL = "http://localhost:3000/products";
+
+    const fetchProducts = async () => {
+        try {
+            const response = await axios.get(API_URL);
+            setProducts(response.data);
+            setFilteredProducts(response.data);
+
+            const totalPages = Math.ceil(response.data.length / productsPerPage);
+            if (currentPage > totalPages) {
+                setCurrentPage(totalPages);
+            }
+
+        } catch (error) {
+            setApiError(`Nie udało się załadować produktów :(, ${error}`);
+        }
+    }
+
+    const addProduct = async (newProduct) => {
+        try {
+            await axios.post(API_URL, newProduct);
+            await fetchProducts();
+            setNotificationMessage(`Dodano produkt: ${newProduct.name}`);
+            toggleNotification();
+        } catch (error) {
+            setApiError(`Nie udało się dodać produktu :(, ${error}`);
+        }
     };
 
-    const updateProduct = (updatedProduct) => {
-        setProducts((prevProducts) =>
-            prevProducts.map((product) =>
-                product.id === updatedProduct.id ? updatedProduct : product
-            )
-        );
-        setNotificationMessage(`Edytowano produkt, id: ${updatedProduct.id}`);
-        toggleNotification();
+    const updateProduct = async (updatedProduct) => {
+        try {
+            await axios.put(`${API_URL}/${updatedProduct.id}`, updatedProduct);
+            await fetchProducts();
+            setNotificationMessage(`Edytowano produkt, id: ${updatedProduct.id}`);
+            toggleNotification();
+        } catch (error) {
+            setApiError(`Nie udało się zaktualizować produktu: ${updatedProduct.id} :(, ${error}`);
+        }
     };
 
-    const deleteProduct = (id) => {
-        setProducts((prevProducts) =>
-            prevProducts.filter((product) => product.id !== id)
-        );
+    const deleteProduct = async (id) => {
+        try {
+            await axios.delete(`${API_URL}/${id}`);
+            await fetchProducts();
+
+        } catch (error) {
+            setApiError(`Nie udało się usunąć produktu: ${id} :(, ${error}`);
+        }
     };
 
     const toggleModal = (product) => {
@@ -64,6 +96,9 @@ export const GlobalProvider = ({children}) => {
                 notification,
                 setNotification,
                 notificationMessage,
+                currentPage,
+                setCurrentPage,
+                productsPerPage,
                 toggleModal,
                 toggleEdit,
                 toggleNotification,

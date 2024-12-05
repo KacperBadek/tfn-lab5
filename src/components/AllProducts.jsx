@@ -1,12 +1,13 @@
-import MyButton from "./MyButton.jsx";
 import {useContext, useLayoutEffect, useRef} from "react";
+import {FixedSizeList as List} from "react-window";
 import Filter from "./Filter.jsx";
 import ProductDetails from "./ProductDetails.jsx";
 import AddProduct from "./AddProduct.jsx";
 import EditProduct from "./EditProduct.jsx";
 import Notification from "./Notification.jsx";
 import {GlobalContext} from "../GlobalContext.jsx";
-import products from "../products.js";
+import Pagination from "./Pagination.jsx";
+import ProductRow from "./ProductRow.jsx";
 
 export default function AllProducts() {
 
@@ -18,11 +19,13 @@ export default function AllProducts() {
         toggleModal,
         toggleEdit,
         modal,
-
         edit,
         isProductAdded,
         setIsProductAdded,
-        notification
+        notification,
+        currentPage,
+        setCurrentPage,
+        productsPerPage
     } = useContext(GlobalContext);
 
     const lastProductRef = useRef(null);
@@ -36,6 +39,10 @@ export default function AllProducts() {
         }
     }, [isProductAdded]);
 
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
     return (
         <>
             <div>
@@ -45,29 +52,27 @@ export default function AllProducts() {
             <div>
                 <h1>Produkty</h1>
                 <Filter/>
-                {/*<ul>*/}
-                {/*    {filteredProducts.map((product, index) => (*/}
-                {/*        <li key={product.id} style={{listStyle: "none", cursor: "pointer"}}*/}
-                {/*            ref={index === filteredProducts.length - 1 ? lastProductRef : null}>*/}
-                {/*            <div onClick={() => toggleModal(product)}>*/}
-                {/*                <h2>{product.name}</h2>*/}
-                {/*                <p>{product.category}</p>*/}
-                {/*                <p>{product.quantity}</p>*/}
-                {/*                <p>{product.unitPrice}</p>*/}
-                {/*            </div>*/}
-                {/*            <MyButton handler={() => toggleEdit(product)} text="Edytuj"></MyButton>*/}
-                {/*            <MyButton handler={() => deleteProduct(product.id)} text="Usuń"></MyButton>*/}
-                {/*        </li>*/}
-                {/*    ))}*/}
-                {/*</ul>*/}
+                <List
+                    height={600}
+                    width="100%"
+                    itemCount={currentProducts.length}
+                    itemSize={250}
+                    itemData={{
+                        currentProducts: currentProducts,
+                        toggleModal,
+                        toggleEdit,
+                        deleteProduct,
+                    }}
+                >
+                    {ProductRow}
+                </List>
 
-                <ul>
-                    {products.map((product) => (
-                        <li key={product.id}>
-                            <h2>{product.name}</h2>
-                        </li>
-                        ))}
-                </ul>
+                <Pagination
+                    totalProducts={filteredProducts.length}
+                    productsPerPage={productsPerPage}
+                    currentPage={currentPage}
+                    setCurrentPage={setCurrentPage}
+                />
 
                 {modal && selectedProduct && (<ProductDetails product={selectedProduct} toggleModal={toggleModal}/>)}
                 {edit && selectedProduct && (
