@@ -25,6 +25,12 @@ export const GlobalProvider = ({children}) => {
             setProducts(response.data);
             setFilteredProducts(response.data);
 
+            try {
+                localStorage.setItem("products", JSON.stringify(response.data));
+            } catch (localStorageError) {
+                console.error("Nie udało się zapisać danych w localStorage:", localStorageError);
+            }
+
             const totalPages = Math.ceil(response.data.length / productsPerPage);
             if (currentPage > totalPages) {
                 setCurrentPage(totalPages);
