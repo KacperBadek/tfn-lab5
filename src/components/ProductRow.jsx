@@ -1,6 +1,7 @@
 import MyButton from "./MyButton.jsx";
+import React from "react";
 
-export default function ProductRow({index, style, data}) {
+const ProductRow = React.memo(({index, style, data}) => {
     const {currentProducts, toggleModal, toggleEdit, deleteProduct} = data;
     const product = currentProducts[index];
 
@@ -24,4 +25,6 @@ export default function ProductRow({index, style, data}) {
             </div>
         </div>
     );
-}
+})
+
+export default ProductRow;

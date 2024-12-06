@@ -1,4 +1,4 @@
-import {useContext, useLayoutEffect, useRef} from "react";
+import {useContext, useLayoutEffect, useMemo, useRef} from "react";
 import {FixedSizeList as List} from "react-window";
 import Filter from "./Filter.jsx";
 import ProductDetails from "./ProductDetails.jsx";
@@ -12,7 +12,7 @@ import ProductRow from "./ProductRow.jsx";
 export default function AllProducts() {
 
     const {
-        filteredProducts,
+        state,
         deleteProduct,
         updateProduct,
         selectedProduct,
@@ -22,11 +22,12 @@ export default function AllProducts() {
         edit,
         isProductAdded,
         setIsProductAdded,
-        notification,
         currentPage,
         setCurrentPage,
         productsPerPage
     } = useContext(GlobalContext);
+
+    const {products, filteredProducts, notification} = state;
 
     const lastProductRef = useRef(null);
 
@@ -42,6 +43,13 @@ export default function AllProducts() {
     const indexOfLastProduct = currentPage * productsPerPage;
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+
+    const totalProductValue = useMemo(() => {
+        console.log("licze total value")
+        return products.reduce((total, product) => {
+            return total + product.quantity * product.unitPrice;
+        }, 0)
+    }, [products])
 
     return (
         <>
@@ -73,6 +81,7 @@ export default function AllProducts() {
                     currentPage={currentPage}
                     setCurrentPage={setCurrentPage}
                 />
+                <div>Total value of products: <strong>{totalProductValue}</strong></div>
 
                 {modal && selectedProduct && (<ProductDetails product={selectedProduct} toggleModal={toggleModal}/>)}
                 {edit && selectedProduct && (

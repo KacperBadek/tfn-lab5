@@ -4,7 +4,7 @@ import {GlobalContext} from "../GlobalContext.jsx";
 
 export default function ProductFetcher() {
 
-    const {setProducts, setFilteredProducts} = useContext(GlobalContext);
+    const {state, dispatch} = useContext(GlobalContext);
 
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState("");
@@ -15,8 +15,7 @@ export default function ProductFetcher() {
         setIsLoading(true);
         try {
             const response = await axios.get(API_URL);
-            setProducts(response.data);
-            setFilteredProducts(response.data);
+            dispatch({type: "SET_PRODUCTS", products: response.data, filteredProducts: response.data})
             console.log("Fetched Products:", response.data);
 
             try {
@@ -36,8 +35,7 @@ export default function ProductFetcher() {
         try {
             const storedProducts = JSON.parse(localStorage.getItem("products"));
             if (storedProducts) {
-                setProducts(storedProducts);
-                setFilteredProducts(storedProducts);
+                dispatch({type: "SET_PRODUCTS", products: storedProducts, filteredProducts: storedProducts})
                 setIsLoading(false)
             } else {
                 fetchProducts();

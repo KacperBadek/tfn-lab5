@@ -1,8 +1,9 @@
 import {useState, useEffect, useContext} from "react";
-import { GlobalContext } from "../GlobalContext";
+import {GlobalContext} from "../GlobalContext";
 
 export default function Filter() {
-    const { products, setFilteredProducts } = useContext(GlobalContext);
+    const {state, dispatch} = useContext(GlobalContext);
+    const {products} = state;
 
     const [category, setCategory] = useState('Wszystko');
     const [priceMin, setPriceMin] = useState('0')
@@ -16,8 +17,8 @@ export default function Filter() {
             return isCategoryMatch && isPriceInRange;
         });
 
-        setFilteredProducts(filtered);
-    }, [category, priceMin, priceMax, products, setFilteredProducts]);
+        dispatch({type: "SET_FILTERED_PRODUCTS", filteredProducts: filtered})
+    }, [category, priceMin, priceMax, products]);
 
 
     return (

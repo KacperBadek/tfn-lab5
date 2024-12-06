@@ -1,29 +1,55 @@
-import {createContext, useState} from "react";
+import {createContext, useCallback, useReducer, useState} from "react";
 import axios from "axios";
 
+const initialState = {
+    products: [],
+    filteredProducts: [],
+    notification: false,
+    notificationMessage: null,
+}
+
+function reducer(state, action) {
+    switch (action.type) {
+        case "SET_PRODUCTS":
+            return {
+                ...state,
+                products: action.products,
+                filteredProducts: action.products
+            };
+        case "SET_FILTERED_PRODUCTS":
+            return {
+                ...state,
+                filteredProducts: action.filteredProducts,
+            };
+        case "SET_NOTIFICATION":
+            return {
+                ...state,
+                notification: action.value,
+                notificationMessage: action.message,
+            };
+        default:
+            return state;
+    }
+}
+
+const API_URL = "http://localhost:3000/products";
 export const GlobalContext = createContext();
 
 export const GlobalProvider = ({children}) => {
-    const [products, setProducts] = useState([]);
-    const [filteredProducts, setFilteredProducts] = useState([]);
+    const [state, dispatch] = useReducer(reducer, initialState);
+
     const [selectedProduct, setSelectedProduct] = useState(null);
     const [modal, setModal] = useState(false);
     const [edit, setEdit] = useState(false);
     const [isProductAdded, setIsProductAdded] = useState(false);
-    const [notification, setNotification] = useState(false);
-    const [notificationMessage, setNotificationMessage] = useState(null);
     const [apiError, setApiError] = useState("");
     const [currentPage, setCurrentPage] = useState(1);
     const [productsPerPage, setProductsPerPage] = useState(4);
 
-
-    const API_URL = "http://localhost:3000/products";
-
-    const fetchProducts = async () => {
+    const fetchProducts = useCallback(async () => {
         try {
             const response = await axios.get(API_URL);
-            setProducts(response.data);
-            setFilteredProducts(response.data);
+            dispatch({type: "SET_PRODUCTS", products: response.data, filteredProducts: response.data})
 
             try {
                 localStorage.setItem("products", JSON.stringify(response.data));
@@ -39,31 +65,37 @@ export const GlobalProvider = ({children}) => {
         } catch (error) {
             setApiError(`Nie udało się załadować produktów :(, ${error}`);
         }
-    }
+    }, [])
 
-    const addProduct = async (newProduct) => {
+    const addProduct = useCallback(async (newProduct) => {
         try {
             await axios.post(API_URL, newProduct);
             await fetchProducts();
-            setNotificationMessage(`Dodano produkt: ${newProduct.name}`);
-            toggleNotification();
+            dispatch({
+                type: "SET_NOTIFICATION",
+                value: !state.notification,
+                message: `Dodano produkt: ${newProduct.name}`
+            })
         } catch (error) {
             setApiError(`Nie udało się dodać produktu :(, ${error}`);
         }
-    };
+    }, [fetchProducts])
 
-    const updateProduct = async (updatedProduct) => {
+    const updateProduct = useCallback(async (updatedProduct) => {
         try {
             await axios.put(`${API_URL}/${updatedProduct.id}`, updatedProduct);
             await fetchProducts();
-            setNotificationMessage(`Edytowano produkt, id: ${updatedProduct.id}`);
-            toggleNotification();
+            dispatch({
+                type: "SET_NOTIFICATION",
+                value: !state.notification,
+                message: `Edytowano produkt, id: ${updatedProduct.id}`
+            })
         } catch (error) {
             setApiError(`Nie udało się zaktualizować produktu: ${updatedProduct.id} :(, ${error}`);
         }
-    };
+    }, [fetchProducts])
 
-    const deleteProduct = async (id) => {
+    const deleteProduct = useCallback(async (id) => {
         try {
             await axios.delete(`${API_URL}/${id}`);
             await fetchProducts();
@@ -71,7 +103,7 @@ export const GlobalProvider = ({children}) => {
         } catch (error) {
             setApiError(`Nie udało się usunąć produktu: ${id} :(, ${error}`);
         }
-    };
+    }, [fetchProducts])
 
     const toggleModal = (product) => {
         setSelectedProduct(product);
@@ -83,31 +115,21 @@ export const GlobalProvider = ({children}) => {
         setEdit(!edit);
     };
 
-    const toggleNotification = () => {
-        setNotification(!notification);
-    }
-
     return (
         <GlobalContext.Provider
             value={{
-                products,
-                setProducts,
-                filteredProducts,
-                setFilteredProducts,
+                state,
+                dispatch,
                 selectedProduct,
                 modal,
                 edit,
                 isProductAdded,
                 setIsProductAdded,
-                notification,
-                setNotification,
-                notificationMessage,
                 currentPage,
                 setCurrentPage,
                 productsPerPage,
                 toggleModal,
                 toggleEdit,
-                toggleNotification,
                 addProduct,
                 updateProduct,
                 deleteProduct,
