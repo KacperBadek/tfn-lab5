@@ -1,10 +1,19 @@
 import './App.css'
-import AllProducts from "./components/AllProducts.jsx";
-import {useContext, useEffect, useState} from "react";
+// import AllProducts from "./components/AllProducts.jsx";
+import {lazy, Suspense, useContext, useEffect, useState} from "react";
 import {GlobalContext} from "./GlobalContext";
 import DATA from "./products.js";
+import ErrorBoundary from "./ErrorBoundary.jsx";
+import {ClipLoader} from "react-spinners";
+
+const AllProducts = lazy(() => import("./components/AllProducts.jsx"));
 
 function App() {
+    const [showProducts, setShowProducts] = useState(false);
+
+    const handleShowProducts = () => {
+        setShowProducts(true);
+    };
 
     // const {setProducts, setFilteredProducts} = useContext(GlobalContext);
     // const [error, setError] = useState(null);
@@ -36,7 +45,16 @@ function App() {
 
     return (
         <>
-            <AllProducts/>
+            <ErrorBoundary>
+                <div>
+                    <button onClick={handleShowProducts}>Pokaż produkty</button>
+                </div>
+                {showProducts && (
+                    <Suspense fallback={<div style={{ textAlign: "center", padding: "20px" }}><ClipLoader color="white" /></div>}>
+                        <AllProducts />
+                    </Suspense>
+                )}
+            </ErrorBoundary>
         </>
     )
 }

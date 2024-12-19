@@ -5,7 +5,6 @@ import {GlobalContext} from "../GlobalContext";
 export default function ProductDetails() {
 
     const {selectedProduct, toggleModal} = useContext(GlobalContext);
-
     return (
         <div className="modal">
             <div onClick={toggleModal} className="overlay"></div>

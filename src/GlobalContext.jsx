@@ -13,8 +13,8 @@ function reducer(state, action) {
         case "SET_PRODUCTS":
             return {
                 ...state,
-                products: action.products,
-                filteredProducts: action.products
+                products: Array.isArray(action.products) ? action.products : [],
+                filteredProducts: Array.isArray(action.products) ? action.products : [],
             };
         case "SET_FILTERED_PRODUCTS":
             return {

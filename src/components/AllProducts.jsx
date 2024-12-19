@@ -1,13 +1,19 @@
-import {useContext, useLayoutEffect, useMemo, useRef} from "react";
+import {lazy, Suspense, useContext, useEffect, useLayoutEffect, useMemo, useRef, useState} from "react";
 import {FixedSizeList as List} from "react-window";
-import Filter from "./Filter.jsx";
-import ProductDetails from "./ProductDetails.jsx";
-import AddProduct from "./AddProduct.jsx";
+// import Filter from "./Filter.jsx";
+// import ProductDetails from "./ProductDetails.jsx";
+// import AddProduct from "./AddProduct.jsx";
 import EditProduct from "./EditProduct.jsx";
 import Notification from "./Notification.jsx";
 import {GlobalContext} from "../GlobalContext.jsx";
 import Pagination from "./Pagination.jsx";
 import ProductRow from "./ProductRow.jsx";
+import BrokenComponent from "./BrokenComponent.jsx";
+import {ClipLoader} from "react-spinners";
+
+const Filter = lazy(() => import("./Filter.jsx"));
+const AddProduct = lazy(() => import("./AddProduct.jsx"));
+const ProductDetails = lazy(() => import("./ProductDetails.jsx"));
 
 export default function AllProducts() {
 
@@ -51,15 +57,77 @@ export default function AllProducts() {
         }, 0)
     }, [products])
 
+    const [loadingProductDetails, setLoadingProductDetails] = useState(false);
+    const [productDetailsError, setProductDetailsError] = useState(null);
+    const [timerStarted, setTimerStarted] = useState(false);
+
+    useEffect(() => {
+        if (modal && selectedProduct) {
+            setLoadingProductDetails(true);
+            setProductDetailsError(null);
+            setTimerStarted(false);
+
+            const timer = setTimeout(() => {
+                if (!loadingProductDetails) {
+                    setProductDetailsError("Trwa ładowanie dłużej niż oczekiwano. Próba ponownego ładowania...");
+                }
+            }, 2000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [modal, selectedProduct, loadingProductDetails]);
+
+    const retryLoadProductDetails = () => {
+        setLoadingProductDetails(true);
+        setProductDetailsError(null);
+    };
+
+    const ProductDetailsWithRetry = () => {
+        if (productDetailsError) {
+            setTimeout(() => {
+                retryLoadProductDetails();
+            }, 3000);
+
+            return (
+                <div>
+                    <p style={{ color: "red" }}>
+                        Wystąpił problem z ładowaniem szczegółów produktu. Próba ponownego ładowania...
+                    </p>
+                </div>
+            );
+        }
+
+        return (
+            <Suspense
+                fallback={
+                    loadingProductDetails ? (
+                        <div style={{ textAlign: "center", padding: "20px" }}>
+                            <ClipLoader color="white" />
+                            <p>Trwa ładowanie szczegółów produktu. Proszę czekać...</p>
+                        </div>
+                    ) : null
+                }
+            >
+                <ProductDetails product={selectedProduct} toggleModal={toggleModal} />
+            </Suspense>
+        );
+    };
+
     return (
         <>
+            {/*} <BrokenComponent/>*/}
             <div>
-                <AddProduct/>
+                <Suspense fallback={<div>Loading add form...</div>}>
+                    <AddProduct/>
+                </Suspense>
             </div>
 
             <div>
                 <h1>Produkty</h1>
-                <Filter/>
+                <Suspense fallback={<div>Loading filter...</div>}>
+                    <Filter/>
+                </Suspense>
+
                 <List
                     height={600}
                     width="100%"
@@ -83,7 +151,7 @@ export default function AllProducts() {
                 />
                 <div>Total value of products: <strong>{totalProductValue}</strong></div>
 
-                {modal && selectedProduct && (<ProductDetails product={selectedProduct} toggleModal={toggleModal}/>)}
+                {modal && selectedProduct && <ProductDetailsWithRetry />}
                 {edit && selectedProduct && (
                     <EditProduct product={selectedProduct} toggleEdit={toggleEdit} updateProduct={updateProduct}/>)}
                 {notification && (<Notification/>)}
